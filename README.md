@@ -107,6 +107,7 @@ Your Jenkins image already contains docker-cli, and the Jenkins account is able 
 Credentials will let your pipelines interact with other services.
 
 #### Nexus Credentials
+These credentials will be used to push images and pacakges to Nexus.
 
 * In the **Stores scoped to *Jenkins*** section, select Jenkins
 * Then click on **Global credentials (unrestricted)**
@@ -115,7 +116,9 @@ Credentials will let your pipelines interact with other services.
     * Enter the *username* and *password* you picked in the **Setting Up Nexus section above**.
     * For the Id field, just enter *nexus*.
 
-#### Jenkins Credentials
+#### Gogs Credentials
+These credentials are needed to download your projects from Gogs.
+
 * In the **Stores scoped to *Jenkins*** section, select Jenkins
 * Then click on **Add Credentials** again to add the Git credentials that will let you download code from Gogs. You can use your own account or you can define a separate account in Gogs for Jenkins to use. The latter is recommended.
     * Select *SSH Username with private key* in the **Kind* field.
@@ -146,7 +149,8 @@ For the payload URL you'll use: ```http://jenkins:8080/gogs-webhook/?job=<projec
 The **Test Delivery** button will help you diagnose connectivity.
 
 
-
+## Shared Libraries
+The [Jenkins Shared Lib project](https://github.com/fborghesi/jenkins-shared-lib) can be set up on Jenkins to re-use common functions in project build and deploy tasks.
 
  
 
