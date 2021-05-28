@@ -1,0 +1,38 @@
+FROM jenkins/jenkins:lts
+MAINTAINER Franco Borghesi<franco.borghesi@gmail.com>
+
+USER root
+
+# Fix TZ
+RUN ln -sf /usr/share/zoneinfo/America/Buenos_Aires /etc/localtime
+
+# Install base packages
+RUN apt-get update && apt-get install -y apt-transport-https \
+       ca-certificates curl gnupg2 sudo \
+       software-properties-common \
+       apt-transport-https ca-certificates curl
+
+# Install docker-cli
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+RUN apt-key fingerprint 0EBFCD88
+RUN add-apt-repository \
+       "deb [arch=amd64] https://download.docker.com/linux/debian \
+       $(lsb_release -cs) stable"
+RUN apt-get update && apt-get install -y docker-ce-cli
+
+# Make sure Jenkins can use docker
+RUN usermod -aG root jenkins && echo "jenkins     ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Install Helm
+RUN cd /tmp && wget https://get.helm.sh/helm-v3.6.0-rc.1-linux-amd64.tar.gz &&\
+	tar xzvf helm-v3.6.0-rc.1-linux-amd64.tar.gz && \
+	mv linux-amd64/helm /usr/local/bin
+
+# Install kubectl client
+RUN curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg &&\
+	echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |\
+	tee /etc/apt/sources.list.d/kubernetes.list && apt-get update && apt-get install -y kubectl
+
+USER jenkins
+
+CMD sudo chmod g+w /var/run/docker.sock ; /sbin/tini -- /usr/local/bin/jenkins.sh

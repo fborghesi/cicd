@@ -1,0 +1,53 @@
+version: '3'
+services:
+  nexus:
+    image: "sonatype/nexus3:3.30.0"
+    container_name: "nexus"
+    working_dir: /work/docker
+    networks:
+      default:
+        aliases:
+          - nexus.localdev.net
+    ports:
+      - 8081:8081
+      - 5000:5000
+    volumes:
+      - nexus-data:/nexus-data
+
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile-jenkins
+      # image: "jenkins/jenkins:lts"
+    container_name: "jenkins"
+    privileged: true
+    networks:
+      default:
+        aliases:
+          - jenkins.localdev.net
+    ports: 
+      - 28080:8080
+      - 50000:50000
+    volumes:
+      - jenkins-home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  gogs:
+    image: "gogs/gogs:0.12"
+    container_name: "gogs"
+    networks:
+      default:
+        aliases:
+          - gogs.localdev.net
+    volumes:
+      - gogs-data:/data
+    ports:
+      - "20022:22"
+      - "23000:3000"
+
+volumes:
+  nexus-data:
+  jenkins-home:
+  gogs-data:
+
+
